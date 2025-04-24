@@ -22,7 +22,7 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
   $$
   (\mu^\star, \sigma^\star) = 
-  \operatorname{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
+  \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
   \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m},
   $$
 
@@ -32,7 +32,7 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
   $$
   (\mu^\star, \sigma^\star) = 
-  \operatorname{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
+  \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
   \frac{|u - \hat{u}(\mu, \sigma)|}{u}
   $$
 
@@ -83,7 +83,7 @@ which is evaluated using the log-sum-exp trick.
 When `metric='crps'` is selected in the `compute_weights` method of the `Ensemble` class, the optimal weights are computed by minimizing:
 
 $$
-\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} CRPS(\mu^{*}, v^{*}),
+\mathrm{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} CRPS(\mu^{*}, v^{*}),
 $$
 
 where $W$ is the number of weeks in the forecast period for the logarithmic pooling. 
@@ -91,13 +91,13 @@ where $W$ is the number of weeks in the forecast period for the logarithmic pool
 For a linear pool the optimal weights are computed by minimizing:
 
 $$
-\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} \sum_{j=1}^K alpha_j CRPS(\mu_j, v_j).
+\mathrm{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} \sum_{j=1}^K alpha_j CRPS(\mu_j, v_j).
 $$
 
 The CRPS for a log-normal distribution $\log\mathcal{N}(\mu, \sigma)$ is given by:
 
 $$
-\operatorname{CRPS}(\log\mathcal{N}(\mu, \sigma), y) =
+\mathrm{CRPS}(\log\mathcal{N}(\mu, \sigma), y) =
     y [2 \Phi(y) - 1] - 2 \exp\left(\mu + \frac{\sigma^2}{2}\right)
     \left[ \Phi(\omega - \sigma) + \Phi\left(\frac{\sigma}{\sqrt{2}}\right) \right],    
 $$
