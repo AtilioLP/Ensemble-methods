@@ -61,6 +61,7 @@ Alternatively, we can use **linear pooling** (`mixture='linear'` in `Ensemble` c
 <img src="https://latex.codecogs.com/svg.image?$$\bar{\pi}_{\boldsymbol{\alpha}}(x)=\sum_{j=1}^K\alpha_j&space;f_j(x)$$" title="$$\bar{\pi}_{\boldsymbol{\alpha}}(x)=\sum_{j=1}^K\alpha_j f_j(x)$$" />
 
 In log-space, this becomes:
+
 <img src="https://latex.codecogs.com/svg.image?$$\log\bar{\pi}_{\boldsymbol{\alpha}}(x)=\log\left(\sum_{j=1}^K\alpha_j&space;f_j(x)\right),$$" title="$$\log\bar{\pi}_{\boldsymbol{\alpha}}(x)=\log\left(\sum_{j=1}^K\alpha_j f_j(x)\right),$$" />
 
 which is evaluated using the log-sum-exp trick.
