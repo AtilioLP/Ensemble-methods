@@ -21,17 +21,12 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 - When $m > 0$ and `fn_loss='median'`, the optimization problem is:
 
 <img src="https://latex.codecogs.com/svg.image?$$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_&plus;}\frac{|u-\hat{u}(\mu,\sigma)|}{u}&plus;\frac{|m-\hat{m}(\mu,\sigma)|}{m}$$" title="$$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_+}\frac{|u-\hat{u}(\mu,\sigma)|}{u}+\frac{|m-\hat{m}(\mu,\sigma)|}{m}$$" />
-  \( (\mu^\star, \sigma^\star) = 
-  \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m}, \)
 
   where $\hat{m}(\mu, \sigma)$ and $\hat{u}(\mu, \sigma)$ are the median and 97.5th percentile of the log-normal distribution with parameters $\mu$ and $\sigma$.
 
 - If $m = 0$, the optimization simplifies to:
 
-  $(\mu^\star, \sigma^\star) = 
-  \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u}$
+<img src="https://latex.codecogs.com/svg.image?$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_&plus;}\frac{|u-\hat{u}(\mu,\sigma)|}{u}$" title="$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_+}\frac{|u-\hat{u}(\mu,\sigma)|}{u}$" />
 
 - When `fn_loss='lower'`, the lower bound $l$ is used in place of $m$, the median.
 
@@ -63,15 +58,10 @@ $$
 #### Linear pooling
 Alternatively, we can use **linear pooling** (`mixture='linear'` in `Ensemble` class):
 
-$$
-\bar{\pi}_{\boldsymbol{\alpha}}(x) = \sum_{j=1}^K \alpha_j f_j(x)
-$$
+<img src="https://latex.codecogs.com/svg.image?$$\bar{\pi}_{\boldsymbol{\alpha}}(x)=\sum_{j=1}^K\alpha_j&space;f_j(x)$$" title="$$\bar{\pi}_{\boldsymbol{\alpha}}(x)=\sum_{j=1}^K\alpha_j f_j(x)$$" />
 
 In log-space, this becomes:
-
-$$
-\log \bar{\pi}_{\boldsymbol{\alpha}}(x) = \log\left(\sum_{j=1}^K \alpha_j f_j(x)\right),
-$$
+<img src="https://latex.codecogs.com/svg.image?$$\log\bar{\pi}_{\boldsymbol{\alpha}}(x)=\log\left(\sum_{j=1}^K\alpha_j&space;f_j(x)\right),$$" title="$$\log\bar{\pi}_{\boldsymbol{\alpha}}(x)=\log\left(\sum_{j=1}^K\alpha_j f_j(x)\right),$$" />
 
 which is evaluated using the log-sum-exp trick.
 
@@ -79,17 +69,13 @@ which is evaluated using the log-sum-exp trick.
 
 When `metric='crps'` is selected in the `compute_weights` method of the `Ensemble` class, the optimal weights are computed by minimizing:
 
-$$
-\mathrm{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} CRPS(\mu^{*}, v^{*}),
-$$
+<img src="https://latex.codecogs.com/svg.image?$$\mathrm{argmin}_{\boldsymbol{\alpha}}\sum_{t=1}^{W}CRPS(\mu^{*},v^{*}),$$" title="$$\mathrm{argmin}_{\boldsymbol{\alpha}}\sum_{t=1}^{W}CRPS(\mu^{*},v^{*}),$$" />
 
 where $W$ is the number of weeks in the forecast period for the logarithmic pooling. 
 
 For a linear pool the optimal weights are computed by minimizing:
 
-$$
-\mathrm{argmin}_{\alpha} .
-$$
+<img src="https://latex.codecogs.com/svg.image?$$\mathrm{argmin}_{\mathbf{\alpha}}\sum_{t=1}^{W}\sum_{j=1}^{K}\alpha_j\mathrm{CRPS}(\mu_j,v_j).$$" title="$$\mathrm{argmin}_{\mathbf{\alpha}}\sum_{t=1}^{W}\sum_{j=1}^{K}\alpha_j\mathrm{CRPS}(\mu_j,v_j).$$" />
 
 The CRPS for a log-normal distribution $\log\mathcal{N}(\mu, \sigma)$ is given by:
 
