@@ -20,21 +20,17 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
 - When $m > 0$ and `fn_loss='median'`, the optimization problem is:
 
-  $$
-  (\mu^\star, \sigma^\star) = 
+  $(\mu^\star, \sigma^\star) = 
   \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m},
-  $$
+  \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m},$
 
   where $\hat{m}(\mu, \sigma)$ and $\hat{u}(\mu, \sigma)$ are the median and 97.5th percentile of the log-normal distribution with parameters $\mu$ and $\sigma$.
 
 - If $m = 0$, the optimization simplifies to:
 
-  $$
-  (\mu^\star, \sigma^\star) = 
+  $(\mu^\star, \sigma^\star) = 
   \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u}
-  $$
+  \frac{|u - \hat{u}(\mu, \sigma)|}{u}$
 
 - When `fn_loss='lower'`, the lower bound $l$ is used in place of $m$, the median.
 
