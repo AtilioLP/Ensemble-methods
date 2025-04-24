@@ -20,17 +20,21 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
 - When $m > 0$ and `fn_loss='median'`, the optimization problem is:
 
-  $$(\mu^\star, \sigma^\star) = 
+  $$
+  (\mu^\star, \sigma^\star) = 
   \operatorname{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m},$$
+  \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m},
+  $$
 
   where $\hat{m}(\mu, \sigma)$ and $\hat{u}(\mu, \sigma)$ are the median and 97.5th percentile of the log-normal distribution with parameters $\mu$ and $\sigma$.
 
 - If $m = 0$, the optimization simplifies to:
 
-  $$(\mu^\star, \sigma^\star) = 
+  $$
+  (\mu^\star, \sigma^\star) = 
   \operatorname{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
-  \frac{|u - \hat{u}(\mu, \sigma)|}{u}$$
+  \frac{|u - \hat{u}(\mu, \sigma)|}{u}
+  $$
 
 - When `fn_loss='lower'`, the lower bound $l$ is used in place of $m$, the median.
 
@@ -43,24 +47,34 @@ Combining probabilistic forecasts from multiple models allows us to build more a
 #### Logarithmic pooling
 We use **logarithmic pooling** (`mixture='log'` in `Ensemble` class) to combine predictive distributions $\{f_1, \ldots, f_K\}$ with weights $\boldsymbol{\alpha} = (\alpha_1, \ldots, \alpha_K)$ in the open K-simplex ($\alpha_i \geq 0$, $\sum \alpha_j = 1$):
 
-$$\pi_{\boldsymbol{\alpha}}(x) = t(\boldsymbol{\alpha})\prod_{j=1}^K [f_j(x)]^{\alpha_j},$$
+$$
+\pi_{\boldsymbol{\alpha}}(x) = t(\boldsymbol{\alpha})\prod_{j=1}^K [f_j(x)]^{\alpha_j},
+$$
 
 where $t(\boldsymbol{\alpha})$ is a normalizing constant. In log-space:
 
-$$\log \pi_{\boldsymbol{\alpha}}(x) = \log t(\boldsymbol{\alpha}) + \sum_{j=1}^K \alpha_j \log f_j(x)$$
+$$
+\log \pi_{\boldsymbol{\alpha}}(x) = \log t(\boldsymbol{\alpha}) + \sum_{j=1}^K \alpha_j \log f_j(x)
+$$
 
 For log-normal predictive distributions with parameters $\mu_i$ and $\sigma_i^2$, the pooled distribution is also log-normal with:
 
-$$\mu^{*} = \frac{\sum_{i=1}^{K} w_i \mu_i}{\sum_{i=1}^{K} w_i}, \quad \sigma^{*2} = \left[\sum_{i=1}^{K} w_i\right]^{-1}, \quad \text{where } w_i = \frac{\alpha_i}{\sigma_i^2}$$
+$$
+\mu^{*} = \frac{\sum_{i=1}^{K} w_i \mu_i}{\sum_{i=1}^{K} w_i}, \quad \sigma^{*2} = \left[\sum_{i=1}^{K} w_i\right]^{-1}, \quad \text{where } w_i = \frac{\alpha_i}{\sigma_i^2}
+$$
 
 #### Linear pooling
 Alternatively, we can use **linear pooling** (`mixture='linear'` in `Ensemble` class):
 
-$$\bar{\pi}_{\boldsymbol{\alpha}}(x) = \sum_{j=1}^K \alpha_j f_j(x)$$
+$$
+\bar{\pi}_{\boldsymbol{\alpha}}(x) = \sum_{j=1}^K \alpha_j f_j(x)
+$$
 
 In log-space, this becomes:
 
-$$\log \bar{\pi}_{\boldsymbol{\alpha}}(x) = \log\left(\sum_{j=1}^K \alpha_j f_j(x)\right),$$
+$$
+\log \bar{\pi}_{\boldsymbol{\alpha}}(x) = \log\left(\sum_{j=1}^K \alpha_j f_j(x)\right),
+$$
 
 which is evaluated using the log-sum-exp trick.
 
@@ -68,19 +82,25 @@ which is evaluated using the log-sum-exp trick.
 
 When `metric='crps'` is selected in the `compute_weights` method of the `Ensemble` class, the optimal weights are computed by minimizing:
 
-$$\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} CRPS(\mu^{*}, v^{*}),$$
+$$
+\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} CRPS(\mu^{*}, v^{*}),
+$$
 
 where $W$ is the number of weeks in the forecast period for the logarithmic pooling. 
 
 For a linear pool the optimal weights are computed by minimizing:
 
-$$\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} \sum_{j=1}^K alpha_j CRPS(\mu_j, v_j).$$
+$$
+\operatorname{argmin}_{\boldsymbol{\alpha}} \sum_{t=1}^{W} \sum_{j=1}^K alpha_j CRPS(\mu_j, v_j).
+$$
 
 The CRPS for a log-normal distribution $\log\mathcal{N}(\mu, \sigma)$ is given by:
 
-$$\operatorname{CRPS}(\log\mathcal{N}(\mu, \sigma), y) =
+$$
+\operatorname{CRPS}(\log\mathcal{N}(\mu, \sigma), y) =
     y [2 \Phi(y) - 1] - 2 \exp\left(\mu + \frac{\sigma^2}{2}\right)
-    \left[ \Phi(\omega - \sigma) + \Phi\left(\frac{\sigma}{\sqrt{2}}\right) \right],$$
+    \left[ \Phi(\omega - \sigma) + \Phi\left(\frac{\sigma}{\sqrt{2}}\right) \right],    
+$$
 
 where $\Phi$ is the standard normal CDF and $\omega = \frac{\log y - \mu}{\sigma}$.
 
