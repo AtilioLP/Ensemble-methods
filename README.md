@@ -20,8 +20,7 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
 - When $m > 0$ and `fn_loss='median'`, the optimization problem is:
 
-  ![Equation](https://latex.codecogs.com/svg.latex?%28%5Cmu%5E%7B%5Cstar%7D%2C%20%5Csigma%5E%7B%5Cstar%7D%29%20%3D%20%5Cmathrm%7Bargmin%7D_%7B%5Cmu%20%5Cin%20%5Cmathbb%7BR%7D%2C%20%5Csigma%20%5Cin%20%5Cmathbb%7BR%7D%5E%2B%7D%20%5Cfrac%7B%7Cu%20-%20%5Chat%7Bu%7D%28%5Cmu%2C%20%5Csigma%29%7C%7D%7Bu%7D%20%2B%20%5Cfrac%7B%7Cm%20-%20%5Chat%7Bm%7D%28%5Cmu%2C%20%5Csigma%29%7C%7D%7Bm%7D](https://latex.codecogs.com/svg.image?$$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_&plus;}\frac{|u-\hat{u}(\mu,\sigma)|}{u}&plus;\frac{|m-\hat{m}(\mu,\sigma)|}{m}$$))
-
+<img src="https://latex.codecogs.com/svg.image?$$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_&plus;}\frac{|u-\hat{u}(\mu,\sigma)|}{u}&plus;\frac{|m-\hat{m}(\mu,\sigma)|}{m}$$" title="$$(\mu^\star,\sigma^\star)=\mathrm{argmin}_{\mu\in\mathbb{R},\sigma\in\mathbb{R}_+}\frac{|u-\hat{u}(\mu,\sigma)|}{u}+\frac{|m-\hat{m}(\mu,\sigma)|}{m}$$" />
   \( (\mu^\star, \sigma^\star) = 
   \mathrm{argmin}_{\mu \in \mathbb{R}, \sigma \in \mathbb{R}_+} 
   \frac{|u - \hat{u}(\mu, \sigma)|}{u} + \frac{|m - \hat{m}(\mu, \sigma)|}{m}, \)
