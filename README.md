@@ -91,7 +91,7 @@ where $W$ is the number of weeks in the forecast period for the logarithmic pool
 For a linear pool the optimal weights are computed by minimizing:
 
 $$
-\mathrm{argmin}
+\mathrm{argmin}_{ \mathbf{\alpha} } .
 $$
 
 The CRPS for a log-normal distribution $\log\mathcal{N}(\mu, \sigma)$ is given by:
