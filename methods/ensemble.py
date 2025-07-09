@@ -9,7 +9,7 @@ from scipy.stats import lognorm, norm
 from scipy.interpolate import interp1d
 from scipy.integrate import cumulative_trapezoid
 from scoringrules import crps_lognormal, crps_normal
-from pred_opt import get_df_pars
+from methods.pred_opt import get_df_pars
 
 def validate_df_preds(df_preds: pd.DataFrame, conf_level=0.9):
     """

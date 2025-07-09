@@ -4,13 +4,13 @@ Inside the `short_term_preds` folder, you'll find scripts and notebooks for appl
 
 ### Individual Model Scripts
 
-- `model_arima.py`: Implements an ARIMA model to forecast dengue cases three weeks ahead.
-- `model_gp.py`: Applies a Gaussian Process-based model for three-week-ahead forecasts.
-- `model_lstm.py`: Uses an LSTM model to forecast three weeks ahead.
+- `short_term_preds/model_arima.py`: Implements an ARIMA model to forecast dengue cases three weeks ahead.
+- `short_term_preds/model_gp.py`: Applies a Gaussian Process-based model for three-week-ahead forecasts.
+- `short_term_preds/model_lstm.py`: Uses an LSTM model to forecast three weeks ahead.
 
 ### Mapping Predictions to Log-Normal Distributions
 
-The script `pred_opt.py` contains code to approximate model predictions as log-normal distributions (`dist='normal'` in `Ensemble` and `Score` class). This is a necessary preprocessing step before computing ensembles and comparing CRPS metrics.
+The script `method/pred_opt.py` contains code to approximate model predictions as log-normal distributions (`dist='normal'` in `Ensemble` and `Score` class). This is a necessary preprocessing step before computing ensembles and comparing CRPS metrics.
 
 For each model's forecast, we estimate the log-normal parameters $\mu$ and $\sigma$—representing the mean and standard deviation in log-space—that best fit the predicted intervals and median.
 
@@ -32,7 +32,7 @@ We then use numerical optimization to determine the best-fit mean ($\mu^\star$) 
 
 ### Ensemble Methodology
 
-The ensemble implementation is provided in `ensemble.py`.
+The ensemble implementation is provided in `method/ensemble.py`.
 
 Combining probabilistic forecasts from multiple models allows us to build more accurate and robust predictions than relying on any individual model.
 
@@ -90,4 +90,4 @@ where $\Phi$ is the standard normal CDF and $\omega = \frac{\log y - \mu}{\sigma
 
 ### Results
 
-The notebook `short_term_preds/generate_ensembles.ipynb` presents the results comparing linear and logarithmic pooling strategies for combining the individual model forecasts.
+The notebook `short_term_preds/generate_ensembles.ipynb` contains the code used to generate ensemble predictions using both linear and logarithmic pooling strategies. The notebook `short_term_preds/summary_ensemble_results`.ipynb presents the code for generating the figures that compare the results obtained from these two pooling approaches for combining individual model forecasts.
