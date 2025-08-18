@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from numpy import log, exp
 from scipy.stats import lognorm
-from scipy.optimize import minimize
 from matplotlib import use, get_backend
 use('TkAgg', force=True)
 from matplotlib import pyplot as plt
@@ -58,9 +57,9 @@ intervals = pd.DataFrame({
 approxs = [[], []]
 for j in range(0, J):
     aux = aux_functions.get_lognormal_pars(med = intervals['med'][j],
-                             lwr = intervals['lwr'][j],
-                             upr = intervals['upr'][j],
-                             alpha = intervals['level'][j])
+                                           lwr = intervals['lwr'][j],
+                                           upr = intervals['upr'][j],
+                                           alpha = intervals['level'][j])
     approxs[0].append(aux[0])
     approxs[1].append(aux[1])
 
@@ -73,37 +72,9 @@ ln_approx = pd.DataFrame({
 ############### HARMONISATION ###############
 
 ### Direct estimation from the ECDF
-
-def fit_ln_CDF(x, Fhat, weighting = 1):
-    K = len(x)
-    if len(Fhat) != K:
-        raise ValueError("Size mismatch between x and Fhat.")
-
-    log_probs = log(Fhat)
-
-    if weighting == 1:
-        weights = 1 / (Fhat * (1 - Fhat)) * 1 / np.abs(log_probs)
-    else:
-        weights = np.ones(K)
-
-    def opt_cdf_diff(par, ws = weights):
-        mu = par[0]
-        sigma = np.exp(par[1])
-        theo_logF = lognorm.logcdf(x,
-                                   s = sigma,
-                                   scale = np.exp(mu))
-        loss = np.sum(ws * np.abs(log_probs - theo_logF))
-        return loss
-
-    Opt = minimize(opt_cdf_diff,
-                   x0 = np.array([np.mean(np.log(x)), 0]),
-                   method = 'L-BFGS-B')
-
-    return [Opt.x[0], np.exp(Opt.x[1])]
-
-cdf_fit = fit_ln_CDF(x = out['xi'],
-                     Fhat = out['p'],
-                     weighting = 1)
+cdf_fit = aux_functions.fit_ln_CDF(x = out['xi'],
+                                   Fhat = out['p'],
+                                   weighting = 1)
 
 fitted_cdf = lognorm.cdf(out['xi'], s=cdf_fit[1], scale=np.exp(cdf_fit[0]))
 
@@ -111,61 +82,38 @@ plt.plot(out['xi'], out['p'], 'o',  markerfacecolor = 'none', markeredgecolor = 
 plt.plot(out['xi'], fitted_cdf, color = 'black', linewidth=1.5)
 plt.xlabel('xi')
 plt.ylabel('CDF')
+plt.legend()
 plt.show()
 
 ### Find log-normal which minimises the sum of KLs
-def opt_fn1(par):
-    kls = np.full(J, np.nan)
-    for j in range(0,J):
-        kls[j] = aux_functions.kl_lognormal(mu1 = par[0],
-                                            sigma1 = np.exp(par[1]),
-                                            mu2 = ln_approx['mu'][j],
-                                            sigma2 = ln_approx['sigma'][j])
-
-    return np.sum(kls)
-
-Opt_direct_KL = minimize(opt_fn1,
-                         x0 = np.array([0.0, 0.0]),
-                         method = 'L-BFGS-B')
+Opt_direct_KL = aux_functions.minimize_opt_fn1(method = 'L-BFGS-B',
+                                               x0 = np.array([0.0, 0.0]),
+                                               J = J,
+                                               ln_approx = ln_approx)
 
 direct_KL_pars = [Opt_direct_KL.x[0], exp(Opt_direct_KL.x[1])]
 
 
-### Find the alpha which minimises the sum of KLs (Log-pooling)
-def get_lognormal_pool_pars(ms, vs, weights):
-    pars = pyLogPool.pool_par_gauss(alpha = weights, m = ms, v = vs)
-    return pars
+direct_KL_pars_closedForm = [sum(ln_approx['mu']/ln_approx['sigma']**2)/sum(1/ln_approx['sigma']**2), np.sqrt(J/sum(1/ln_approx['sigma']**2))]
 
-def opt_fn2(par):
-    kls = np.full(J, np.nan)
-    ws = pyLogPool.alpha_01(par)
-    pool = get_lognormal_pool_pars(ms = ln_approx['mu'],
-                                   vs = ln_approx['sigma']**2,
-                                   weights = ws)
-    for j in range(0,J):
-        kls[j] = aux_functions.kl_lognormal(mu1 = pool[0],
-                                            sigma1 = np.sqrt(pool[1]),
-                                            mu2 = ln_approx['mu'][j],
-                                            sigma2 = ln_approx['sigma'][j])
-
-    return np.sum(kls)
-
-Opt_LP_KL = minimize(opt_fn2,
-                     x0 = pyLogPool.alpha_real(np.full(J, 1 / J)))
+Opt_LP_KL = aux_functions.minimize_opt_fn2(x0 = pyLogPool.alpha_real(np.full(J, 1 / J)),
+                                           J = J,
+                                           ln_approx = ln_approx)
 
 opt_LP_alpha = pyLogPool.alpha_01(Opt_LP_KL.x)
 
-opt_LP_KL_pars = get_lognormal_pool_pars(ln_approx['mu'],
-                                     ln_approx['sigma']**2,
-                                     weights = opt_LP_alpha)
+opt_LP_KL_pars = aux_functions.get_lognormal_pool_pars(ln_approx['mu'],
+                                                       ln_approx['sigma']**2,
+                                                       weights = opt_LP_alpha)
 
 LP_KL_pars = [opt_LP_KL_pars[0], opt_LP_KL_pars[1]]
 
 #### Results
 
-print(direct_KL_pars)
-print(LP_KL_pars)
-print(cdf_fit)
+print("direct_KL_pars_closedForm: ", direct_KL_pars_closedForm)
+print("direct_KL_pars:", direct_KL_pars)
+print("LP_KL_pars:", LP_KL_pars)
+print("cdf_fit:", cdf_fit)
 
 eps = 1e-2
 
@@ -242,6 +190,7 @@ y_ticks = np.arange(0, 0.00012501, 0.00001250)
 ax.set_yticks(y_ticks)
 ax.set_ylabel("Density")
 ax.set_title(f"{raw_preds.loc[k, 'uf']} {raw_preds.loc[k, 'date']}")
+ax.legend()
 ax.margins(x=0, y=0)
 
 fig.tight_layout()
