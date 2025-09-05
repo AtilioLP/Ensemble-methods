@@ -9,6 +9,124 @@ import pyLogPool
 def quantile_pair(p):
     return ((1-p)/2, (1+p)/2)
 
+def get_lognormal_pars2(
+    med: float,
+    lwr: float,
+    upr: float,
+    conf_level: float = 0.90,
+    fn_loss: str = "median",
+) -> tuple:
+    """
+    Estimate the parameters of a log-normal distribution based on forecasted median,
+    lower, and upper bounds.
+
+    This function estimates the mu and sigma parameters of a log-normal distribution
+    given a forecast's known median (`med`), lower (`lwr`), and upper (`upr`) confidence
+    interval bounds. The optimization minimizes the discrepancy between the theoretical
+    quantiles of the log-normal distribution and the provided forecast values.
+
+    Parameters
+    ----------
+    med : float
+        The median of the forecast distribution.
+    lwr : float
+        The lower bound of the forecast (corresponding to `(1 - alpha)/2` quantile).
+    upr : float
+        The upper bound of the forecast (corresponding to `(1 + alpha)/2` quantile).
+    Conf_level : float, optional, default=0.90
+        Confidence level used to define the lower and upper bounds.
+    fn_loss : {'median', 'lower'}, optional, default='median'
+        The optimization criterion for fitting the log-normal distribution:
+        - 'median': Minimizes the error in estimating `med` and `upr`.
+        - 'lower': Minimizes the error in estimating `lwr` and `upr`.
+
+    Returns
+    -------
+    tuple
+        A tuple `(mu, sigma)`, where:
+        - `mu` is the estimated location parameter of the log-normal distribution.
+        - `sigma` is the estimated scale parameter.
+
+    Notes
+    -----
+    - The function uses the Nelder-Mead optimization method to minimize the loss function.
+    - If `fn_loss='median'`, the optimization prioritizes minimizing the difference
+      between the estimated and actual median (`med`) and upper bound (`upr`).
+    - If `fn_loss='lower'`, the optimization prioritizes minimizing the difference
+      between the estimated lower bound (`lwr`) and upper bound (`upr`).
+    """
+
+    if fn_loss not in {"median", "lower"}:
+        raise ValueError(
+            "Invalid value for fn_loss. Choose 'median' or 'lower'."
+        )
+
+    if any(x < 0 for x in [med, lwr, upr]):
+        raise ValueError("med, lwr, and upr must be non-negative.")
+
+    def loss_lower(theta):
+        tent_qs = lognorm.ppf(
+            [(1 - conf_level) / 2, (1 + conf_level) / 2],
+            s=theta[1],
+            scale=np.exp(theta[0]),
+        )
+        if lwr == 0:
+            attained_loss = abs(upr - tent_qs[1]) / upr
+        else:
+            attained_loss = (
+                abs(lwr - tent_qs[0]) / lwr + abs(upr - tent_qs[1]) / upr
+            )
+        return attained_loss
+
+    def loss_median(theta):
+        tent_qs = lognorm.ppf(
+            [0.5, (1 + conf_level) / 2], s=theta[1], scale=np.exp(theta[0])
+        )
+        if med == 0:
+            attained_loss = abs(upr - tent_qs[1]) / upr
+        else:
+            attained_loss = (
+                abs(med - tent_qs[0]) / med + abs(upr - tent_qs[1]) / upr
+            )
+        return attained_loss
+
+    if med == 0:
+        mustar = np.log(0.1)
+    else:
+        mustar = np.log(med)
+
+    if fn_loss == "median":
+        result = minimize(
+            loss_median,
+            x0=[mustar, 0.5],
+            bounds=[(-5 * abs(mustar), 5 * abs(mustar)), (0, 15)],
+            method="Nelder-mead",
+            options={
+                "xatol": 1e-6,
+                "fatol": 1e-6,
+                "maxiter": 1000,
+                "maxfev": 1000,
+            },
+        )
+    if fn_loss == "lower":
+        result = minimize(
+            loss_lower,
+            x0=[mustar, 0.5],
+            bounds=[(-5 * abs(mustar), 5 * abs(mustar)), (0, 15)],
+            method="Nelder-mead",
+            options={
+                "xatol": 1e-8,
+                "fatol": 1e-8,
+                "maxiter": 5000,
+                "maxfev": 5000,
+            },
+        )
+
+    meanlog_opt, log_sdlog_opt = result.x
+    
+    return [meanlog_opt, log_sdlog_opt]
+
+
 def get_lognormal_pars(med, lwr, upr, alpha = 0.95):
     def loss(theta):
         tent_qs = lognorm.ppf([(1 - alpha) / 2, (1 + alpha) / 2],
